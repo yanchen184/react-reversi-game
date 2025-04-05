@@ -345,6 +345,264 @@ export function getAIMoveHard(board, aiColor) {
 }
 
 /**
+ * 高級的局面評估函數
+ * @param {Array} board - 當前棋盤
+ * @param {string} playerColor - 玩家顏色
+ * @returns {number} 局面得分
+ */
+export function advancedEvaluateBoard(board, playerColor) {
+  const opponent = getOpponentColor(playerColor);
+  const { black, white } = countPieces(board);
+  const playerPieces = playerColor === BLACK ? black : white;
+  const opponentPieces = playerColor === BLACK ? white : black;
+  
+  // 棋子差異
+  const pieceDiff = playerPieces - opponentPieces;
+  
+  // 移動性（可行動數）
+  const playerMobility = getValidMoves(board, playerColor).length;
+  const opponentMobility = getValidMoves(board, opponent).length;
+  const mobilityScore = playerMobility - opponentMobility;
+  
+  // 角落控制得分
+  let cornerScore = 0;
+  const corners = [
+    [0, 0], [0, BOARD_SIZE-1], 
+    [BOARD_SIZE-1, 0], [BOARD_SIZE-1, BOARD_SIZE-1]
+  ];
+  
+  for (const [row, col] of corners) {
+    if (board[row][col] === playerColor) cornerScore += 25;
+    else if (board[row][col] === opponent) cornerScore -= 25;
+  }
+  
+  // 穩定性（無法被翻轉的棋子）
+  let stabilityScore = 0;
+  // 這裡用簡化版：擁有角落的邊緣棋子較穩定
+  for (const [cornerRow, cornerCol] of corners) {
+    if (board[cornerRow][cornerCol] === playerColor) {
+      // 檢查與該角落相鄰的邊緣
+      if (cornerRow === 0) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[cornerRow][c] === playerColor) stabilityScore += 2;
+        }
+      }
+      if (cornerRow === BOARD_SIZE - 1) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[cornerRow][c] === playerColor) stabilityScore += 2;
+        }
+      }
+      if (cornerCol === 0) {
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          if (board[r][cornerCol] === playerColor) stabilityScore += 2;
+        }
+      }
+      if (cornerCol === BOARD_SIZE - 1) {
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          if (board[r][cornerCol] === playerColor) stabilityScore += 2;
+        }
+      }
+    }
+  }
+  
+  // 危險位置（角落旁邊的位置，容易讓對方拿到角落）
+  let dangerScore = 0;
+  const dangerSpots = [
+    [0, 1], [1, 0], [1, 1], // 左上角附近
+    [0, BOARD_SIZE-2], [1, BOARD_SIZE-2], [1, BOARD_SIZE-1], // 右上角附近
+    [BOARD_SIZE-2, 0], [BOARD_SIZE-1, 1], [BOARD_SIZE-2, 1], // 左下角附近
+    [BOARD_SIZE-2, BOARD_SIZE-1], [BOARD_SIZE-1, BOARD_SIZE-2], [BOARD_SIZE-2, BOARD_SIZE-2] // 右下角附近
+  ];
+  
+  for (const [row, col] of dangerSpots) {
+    // 如果相鄰的角落已經被佔據，則不再是危險位置
+    const adjacentCorner = getAdjacentCorner(row, col);
+    if (board[adjacentCorner[0]][adjacentCorner[1]] === EMPTY) {
+      if (board[row][col] === playerColor) dangerScore -= 10;
+      else if (board[row][col] === opponent) dangerScore += 10;
+    }
+  }
+  
+  // 綜合評分，各因素權重不同
+  const totalPieces = black + white;
+  
+  // 根據遊戲階段調整權重
+  let pieceWeight, mobilityWeight, cornerWeight, stabilityWeight, dangerWeight;
+  
+  if (totalPieces < 20) {
+    // 開局階段：重視移動性和戰略位置
+    pieceWeight = 1;
+    mobilityWeight = 5;
+    cornerWeight = 30;
+    stabilityWeight = 1;
+    dangerWeight = 15;
+  } else if (totalPieces < 40) {
+    // 中盤階段：重視角落和穩定性
+    pieceWeight = 1;
+    mobilityWeight = 3;
+    cornerWeight = 25;
+    stabilityWeight = 10;
+    dangerWeight = 10;
+  } else {
+    // 終盤階段：重視棋子數量
+    pieceWeight = 10;
+    mobilityWeight = 1;
+    cornerWeight = 15;
+    stabilityWeight = 15;
+    dangerWeight = 5;
+  }
+  
+  return (
+    pieceWeight * pieceDiff +
+    mobilityWeight * mobilityScore +
+    cornerWeight * cornerScore +
+    stabilityWeight * stabilityScore +
+    dangerWeight * dangerScore
+  );
+}
+
+/**
+ * 獲取與給定位置相鄰的角落
+ * @param {number} row - 行
+ * @param {number} col - 列
+ * @returns {Array} 角落位置 [row, col]
+ */
+function getAdjacentCorner(row, col) {
+  const cornerRow = row < BOARD_SIZE / 2 ? 0 : BOARD_SIZE - 1;
+  const cornerCol = col < BOARD_SIZE / 2 ? 0 : BOARD_SIZE - 1;
+  return [cornerRow, cornerCol];
+}
+
+/**
+ * 使用Minimax算法和Alpha-Beta剪枝尋找最佳走法
+ * @param {Array} board - 當前棋盤
+ * @param {string} aiColor - AI的棋子顏色
+ * @param {number} depth - 搜索深度
+ * @returns {Object|null} 最佳落子位置 {row, col} 或者 null（無法下子）
+ */
+function minimax(board, depth, isMaximizing, alpha, beta, currentPlayer, aiColor) {
+  // 如果達到終止條件（遊戲結束或深度限制）
+  if (depth === 0 || isGameOver(board)) {
+    return advancedEvaluateBoard(board, aiColor);
+  }
+  
+  const validMoves = getValidMoves(board, currentPlayer);
+  
+  // 如果無子可下，則跳過當前玩家
+  if (validMoves.length === 0) {
+    return minimax(
+      board, 
+      depth - 1, 
+      !isMaximizing, 
+      alpha, 
+      beta, 
+      getOpponentColor(currentPlayer), 
+      aiColor
+    );
+  }
+  
+  if (isMaximizing) {
+    let maxEval = -Infinity;
+    for (const move of validMoves) {
+      const newBoard = makeMove(board, move.row, move.col, currentPlayer);
+      const eval = minimax(
+        newBoard, 
+        depth - 1, 
+        false, 
+        alpha, 
+        beta, 
+        getOpponentColor(currentPlayer), 
+        aiColor
+      );
+      maxEval = Math.max(maxEval, eval);
+      alpha = Math.max(alpha, eval);
+      if (beta <= alpha) break; // Beta剪枝
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (const move of validMoves) {
+      const newBoard = makeMove(board, move.row, move.col, currentPlayer);
+      const eval = minimax(
+        newBoard, 
+        depth - 1, 
+        true, 
+        alpha, 
+        beta, 
+        getOpponentColor(currentPlayer), 
+        aiColor
+      );
+      minEval = Math.min(minEval, eval);
+      beta = Math.min(beta, eval);
+      if (beta <= alpha) break; // Alpha剪枝
+    }
+    return minEval;
+  }
+}
+
+/**
+ * 地獄模式AI：使用Minimax算法和更複雜的評估函數
+ * @param {Array} board - 當前棋盤
+ * @param {string} aiColor - AI的棋子顏色
+ * @returns {Object|null} 選擇的落子位置 {row, col} 或者 null（無法下子）
+ */
+export function getAIMoveHell(board, aiColor) {
+  const validMoves = getValidMoves(board, aiColor);
+  
+  if (validMoves.length === 0) {
+    return null;
+  }
+  
+  let bestMove = null;
+  let bestScore = -Infinity;
+  
+  // 調整搜索深度（根據棋盤上的棋子數量）
+  const { black, white } = countPieces(board);
+  const totalPieces = black + white;
+  let searchDepth;
+  
+  if (totalPieces < 20) {
+    searchDepth = 4; // 開局階段深度較小以提高速度
+  } else if (totalPieces < 45) {
+    searchDepth = 5; // 中盤可以適當增加深度
+  } else {
+    searchDepth = 6; // 終盤更深的搜索
+  }
+  
+  // 優化：先評估所有移動並排序，以提高剪枝效率
+  const scoredMoves = [];
+  for (const move of validMoves) {
+    const newBoard = makeMove(board, move.row, move.col, aiColor);
+    const score = advancedEvaluateBoard(newBoard, aiColor);
+    scoredMoves.push({ move, score });
+  }
+  
+  // 按初步評分排序，優先評估更有希望的移動
+  scoredMoves.sort((a, b) => b.score - a.score);
+  
+  // 對每個可能的移動進行Minimax搜索
+  for (const { move } of scoredMoves) {
+    const newBoard = makeMove(board, move.row, move.col, aiColor);
+    const score = minimax(
+      newBoard, 
+      searchDepth - 1, 
+      false, 
+      -Infinity, 
+      Infinity, 
+      getOpponentColor(aiColor), 
+      aiColor
+    );
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = move;
+    }
+  }
+  
+  return bestMove;
+}
+
+/**
  * 簡單的局面評估函數
  * @param {Array} board - 當前棋盤
  * @param {string} playerColor - 玩家顏色
