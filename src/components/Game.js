@@ -25,8 +25,8 @@ const Game = () => {
   const [isOver, setIsOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [pieces, setPieces] = useState({ black: 2, white: 2 }); // 初始棋子數量
-  const [gameMode, setGameMode] = useState('pvp'); // 'pvp' 或 'ai'
-  const [difficulty, setDifficulty] = useState('medium'); // 'easy', 'medium', 'hard'
+  const [gameMode, setGameMode] = useState('ai'); // 默認為 AI 模式
+  const [difficulty, setDifficulty] = useState('medium'); // 默認中等難度
   const [playerSkipped, setPlayerSkipped] = useState(false);
 
   // 初始化遊戲
