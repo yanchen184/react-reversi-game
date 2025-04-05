@@ -7,6 +7,17 @@
   max-width: 500px;
 }
 
+.game-mode-display {
+  background-color: #3a5a78;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .player-status {
   display: flex;
   justify-content: space-around;
@@ -126,4 +137,24 @@
 .game-result .winner.tie {
   background-color: #ccc;
   color: #333;
+}
+
+.skip-button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.skip-button:hover {
+  background-color: #ec971f;
+}
+
+.skip-button:active {
+  background-color: #d58512;
 }
