@@ -1,0 +1,82 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+  background-color: #065106;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* 游戲指示器 */
+.board-coordinates {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.board-coordinates-letters {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.board-coordinates-letters span {
+  width: 60px;
+  text-align: center;
+}
+
+.board-coordinates-numbers {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 480px;
+  margin-right: 5px;
+}
+
+.board-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* 響應式設計 */
+@media (max-width: 600px) {
+  .board-coordinates-letters span {
+    width: 40px;
+  }
+  
+  .board-coordinates-numbers {
+    height: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .board-coordinates-letters span {
+    width: 35px;
+    font-size: 0.8rem;
+  }
+  
+  .board-coordinates-numbers {
+    height: 280px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .board-coordinates-letters span {
+    width: 30px;
+    font-size: 0.7rem;
+  }
+  
+  .board-coordinates-numbers {
+    height: 240px;
+    font-size: 0.7rem;
+  }
+}
