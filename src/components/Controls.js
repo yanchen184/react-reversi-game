@@ -35,6 +35,7 @@ const Controls = ({
               <option value="easy">簡單</option>
               <option value="medium">中等</option>
               <option value="hard">困難</option>
+              <option value="hell" className="hell-option">地獄模式</option>
             </select>
           </div>
         )}
@@ -48,6 +49,12 @@ const Controls = ({
           {isGameOver ? '新遊戲' : '重新開始'}
         </button>
       </div>
+      
+      {difficulty === 'hell' && (
+        <div className="hell-mode-warning">
+          ⚠️ 地獄模式：使用Minimax算法和高級評估，非常強大！
+        </div>
+      )}
     </div>
   );
 };
