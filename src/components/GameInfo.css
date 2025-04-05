@@ -18,6 +18,24 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.game-mode-display.hell-mode {
+  background-color: #ff4757;
+  animation: hellPulse 2s infinite;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+}
+
+@keyframes hellPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(255, 71, 87, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+  }
+}
+
 .player-status {
   display: flex;
   justify-content: space-around;
@@ -87,6 +105,18 @@
   border: 1px solid #ccc;
 }
 
+.current-player.white.hell-thinking {
+  color: #fff;
+  background-color: #ff4757;
+  border: none;
+  animation: thinking 1.5s infinite;
+}
+
+@keyframes thinking {
+  0%, 100% { background-color: #ff4757; }
+  50% { background-color: #c0392b; }
+}
+
 .game-message {
   margin: 10px 0;
   padding: 10px 15px;
@@ -102,6 +132,28 @@
 .game-message.success {
   background-color: #e6ffed;
   color: #227c39;
+}
+
+.game-message.thinking {
+  background-color: #f0f4ff;
+  animation: thinkingBg 2s infinite;
+}
+
+.game-message.thinking-hell {
+  background-color: #ffe0e0;
+  color: #ff4757;
+  animation: hellThinking 1.5s infinite;
+  box-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
+}
+
+@keyframes thinkingBg {
+  0%, 100% { background-color: #f0f4ff; }
+  50% { background-color: #e0e8ff; }
+}
+
+@keyframes hellThinking {
+  0%, 100% { background-color: #ffe0e0; box-shadow: 0 0 5px rgba(255, 71, 87, 0.5); }
+  50% { background-color: #ffcaca; box-shadow: 0 0 10px rgba(255, 71, 87, 0.7); }
 }
 
 .game-result {
@@ -137,6 +189,15 @@
 .game-result .winner.tie {
   background-color: #ccc;
   color: #333;
+}
+
+.hell-win-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-style: italic;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 5px 10px;
+  border-radius: 4px;
 }
 
 .skip-button {
