@@ -14,7 +14,8 @@ import {
   getGameResult,
   getAIMoveEasy,
   getAIMoveMedium,
-  getAIMoveHard
+  getAIMoveHard,
+  getAIMoveHell
 } from '../utils/gameUtils';
 
 const Game = () => {
@@ -28,6 +29,7 @@ const Game = () => {
   const [gameMode, setGameMode] = useState('ai'); // 默認為 AI 模式
   const [difficulty, setDifficulty] = useState('medium'); // 默認中等難度
   const [playerSkipped, setPlayerSkipped] = useState(false);
+  const [thinking, setThinking] = useState(false); // 增加一個狀態標記 AI 是否在思考
 
   // 初始化遊戲
   useEffect(() => {
@@ -49,13 +51,19 @@ const Game = () => {
     // 如果是AI模式且輪到AI（白方）
     if (gameMode === 'ai' && currentPlayer === WHITE && !isOver) {
       // 延遲一下，讓玩家能夠看到棋盤變化
+      setThinking(true); // 設置思考狀態為 true
+      
+      // 對於地獄模式，給予更長的延遲，讓玩家感受到它的"思考"
+      const delay = difficulty === 'hell' ? 1000 : 500;
+      
       const timer = setTimeout(() => {
         makeAIMove();
-      }, 500);
+        setThinking(false); // AI 移動完成後設置思考狀態為 false
+      }, delay);
       
       return () => clearTimeout(timer);
     }
-  }, [currentPlayer, board, isOver, gameMode]);
+  }, [currentPlayer, board, isOver, gameMode, difficulty]);
 
   // 檢查遊戲結束條件
   useEffect(() => {
@@ -96,8 +104,8 @@ const Game = () => {
 
   // 處理玩家落子
   const handleCellClick = (row, col) => {
-    // 如果遊戲結束或者不是有效的移動位置，則不做任何處理
-    if (isOver || !validMoves.some(move => move.row === row && move.col === col)) {
+    // 如果AI正在思考，遊戲結束或者不是有效的移動位置，則不做任何處理
+    if (thinking || isOver || !validMoves.some(move => move.row === row && move.col === col)) {
       return;
     }
     
@@ -124,8 +132,11 @@ const Game = () => {
       case 'hard':
         move = getAIMoveHard(board, WHITE);
         break;
+      case 'hell':
+        move = getAIMoveHell(board, WHITE);
+        break;
       default:
-        move = getAIMoveEasy(board, WHITE);
+        move = getAIMoveMedium(board, WHITE);
     }
     
     if (move) {
@@ -143,7 +154,7 @@ const Game = () => {
 
   // 手動跳過回合
   const skipTurn = () => {
-    if (validMoves.length === 0 && !isOver) {
+    if (validMoves.length === 0 && !isOver && !thinking) {
       setCurrentPlayer(currentPlayer === BLACK ? WHITE : BLACK);
     }
   };
@@ -155,6 +166,7 @@ const Game = () => {
     setIsOver(false);
     setWinner(null);
     setPlayerSkipped(false);
+    setThinking(false);
   };
 
   // 切換遊戲模式
@@ -178,8 +190,10 @@ const Game = () => {
         isGameOver={isOver}
         winner={winner}
         gameMode={gameMode}
-        skipTurn={validMoves.length === 0 && !isOver ? skipTurn : null}
+        difficulty={difficulty}
+        skipTurn={validMoves.length === 0 && !isOver && !thinking ? skipTurn : null}
         playerSkipped={playerSkipped}
+        thinking={thinking}
       />
       
       <Board 
