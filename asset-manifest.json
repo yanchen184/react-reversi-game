@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/react-reversi-game/static/css/main.ba72c0bf.css",
-    "main.js": "/react-reversi-game/static/js/main.e669cabe.js",
+    "main.js": "/react-reversi-game/static/js/main.258129b4.js",
     "static/js/453.f623be52.chunk.js": "/react-reversi-game/static/js/453.f623be52.chunk.js",
     "index.html": "/react-reversi-game/index.html",
     "main.ba72c0bf.css.map": "/react-reversi-game/static/css/main.ba72c0bf.css.map",
-    "main.e669cabe.js.map": "/react-reversi-game/static/js/main.e669cabe.js.map",
+    "main.258129b4.js.map": "/react-reversi-game/static/js/main.258129b4.js.map",
     "453.f623be52.chunk.js.map": "/react-reversi-game/static/js/453.f623be52.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ba72c0bf.css",
-    "static/js/main.e669cabe.js"
+    "static/js/main.258129b4.js"
   ]
 }
