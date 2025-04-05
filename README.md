@@ -1,10 +1,12 @@
 # 黑白棋 (React Reversi)
+[![Deploy to GitHub Pages](https://github.com/yanchen184/react-reversi-game/actions/workflows/deploy.yml/badge.svg)](https://github.com/yanchen184/react-reversi-game/actions/workflows/deploy.yml)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yanchen184/react-reversi-game)
 
 一款用React開發的經典黑白棋（奧賽羅）遊戲，支持玩家對戰和AI模式。
 
 ## 在線演示
 
-[黑白棋遊戲](https://yanchen184.github.io/react-reversi-game)
+🎮 [黑白棋遊戲](https://yanchen184.github.io/react-reversi-game)
 
 ## 遊戲介紹
 
@@ -36,6 +38,7 @@
 - React.js
 - JavaScript ES6+
 - HTML5/CSS3
+- GitHub Actions (CI/CD)
 - GitHub Pages (部署)
 
 ## 本地開發
@@ -60,6 +63,15 @@ npm start
 ```
 npm run build
 ```
+
+部署到 GitHub Pages：
+```
+npm run deploy
+```
+
+## 自動部署
+
+本項目使用 GitHub Actions 進行自動部署。每當推送到 main 分支時，將自動構建並部署到 GitHub Pages。
 
 ## 許可證
 
