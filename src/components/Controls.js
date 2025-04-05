@@ -18,7 +18,6 @@ const Controls = ({
             className="control-select"
             value={gameMode}
             onChange={(e) => onGameModeChange(e.target.value)}
-            disabled={!isGameOver}
           >
             <option value="pvp">雙人對戰</option>
             <option value="ai">單人對戰電腦</option>
@@ -32,7 +31,6 @@ const Controls = ({
               className="control-select"
               value={difficulty}
               onChange={(e) => onDifficultyChange(e.target.value)}
-              disabled={!isGameOver}
             >
               <option value="easy">簡單</option>
               <option value="medium">中等</option>
