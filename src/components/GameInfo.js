@@ -50,27 +50,50 @@ const GameInfo = ({
         </div>
       );
     } else {
-      return (
-        <div className="game-result">
-          遊戲結束！
-          <span className={`winner ${winner}`}>
-            {winner === BLACK ? '黑方' : '白方'}
-          </span>
-          獲勝！
-        </div>
-      );
+      if (gameMode === 'ai') {
+        return (
+          <div className="game-result">
+            遊戲結束！
+            <span className={`winner ${winner}`}>
+              {winner === BLACK ? '您（黑方）' : '電腦（白方）'}
+            </span>
+            獲勝！
+          </div>
+        );
+      } else {
+        return (
+          <div className="game-result">
+            遊戲結束！
+            <span className={`winner ${winner}`}>
+              {winner === BLACK ? '黑方' : '白方'}
+            </span>
+            獲勝！
+          </div>
+        );
+      }
     }
+  };
+
+  // 顯示對戰模式
+  const getModeDisplay = () => {
+    return (
+      <div className="game-mode-display">
+        {gameMode === 'ai' ? '單人對戰電腦' : '雙人對戰'}
+      </div>
+    );
   };
 
   return (
     <div className="game-info">
+      {getModeDisplay()}
+      
       <div className="player-status">
         <div className="player">
           <div className="player-info">
             <div className="player-piece black"></div>
             <span className="player-count">{blackCount}</span>
           </div>
-          <span className="player-label">黑方</span>
+          <span className="player-label">{gameMode === 'ai' ? '玩家' : '黑方'}</span>
           {currentPlayer === BLACK && !isGameOver && (
             <div className="current-player black">當前</div>
           )}
@@ -81,7 +104,7 @@ const GameInfo = ({
             <div className="player-piece white"></div>
             <span className="player-count">{whiteCount}</span>
           </div>
-          <span className="player-label">白方</span>
+          <span className="player-label">{gameMode === 'ai' ? '電腦' : '白方'}</span>
           {currentPlayer === WHITE && !isGameOver && (
             <div className="current-player white">當前</div>
           )}
